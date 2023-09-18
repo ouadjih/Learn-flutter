@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,13 +32,13 @@ class MyAppState extends ChangeNotifier {
     notifyListeners(); // toutes personne surveillant MyAppState est au courant de changement
   }
 
-  var Favorites = <WordPair>[];
+  var favorites = <WordPair>[];
 
   void toggleFavorite() {
-    if (Favorites.contains(current)) {
-      Favorites.remove(current);
+    if (favorites.contains(current)) {
+      favorites.remove(current);
     } else {
-      Favorites.add(current);
+      favorites.add(current);
     }
     notifyListeners();
   }
@@ -48,20 +47,59 @@ class MyAppState extends ChangeNotifier {
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          SafeArea(
+            child: NavigationRail(
+              extended: false,
+              destinations: [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home),
+                  label: Text('Home'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.favorite),
+                  label: Text('Favorites'),
+                ),
+              ],
+              selectedIndex: 0,
+              onDestinationSelected: (value) {
+                print('selected: $value');
+              },
+            ),
+          ),
+          Expanded(
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: GeneratorPage(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class GeneratorPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var mot = appState.current;
 
-    IconData icon = appState.Favorites.contains(appState.current)
-        ? (Icons.favorite)
-        : (Icons.favorite_border);
+    IconData icon;
+    if (appState.favorites.contains(mot)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
 
-    return Scaffold(
-      body: Column(
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           BigCard(mot: mot),
-          SizedBox(
-            height: 10,
-          ),
+          SizedBox(height: 10),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
