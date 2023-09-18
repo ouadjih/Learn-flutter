@@ -28,12 +28,20 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
-  int intValue = Random().nextInt(100) + 50;
-
   void getNext() {
     current = WordPair.random();
-    intValue = Random().nextInt(25) + 5;
     notifyListeners(); // toutes personne surveillant MyAppState est au courant de changement
+  }
+
+  var Favorites = <WordPair>[];
+
+  void toggleFavorite() {
+    if (Favorites.contains(current)) {
+      Favorites.remove(current);
+    } else {
+      Favorites.add(current);
+    }
+    notifyListeners();
   }
 }
 
@@ -42,18 +50,36 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var mot = appState.current;
-    var val = appState.intValue;
+
+    IconData icon = appState.Favorites.contains(appState.current)
+        ? (Icons.favorite)
+        : (Icons.favorite_border);
+
     return Scaffold(
       body: Column(
         children: [
-          Text('Salut Ouadjih you Can do it ! '),
           BigCard(mot: mot),
-          Text("new num : $val"),
-          ElevatedButton(
-            onPressed: () {
-              appState.getNext();
-            },
-            child: Text('Next'),
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  appState.toggleFavorite();
+                },
+                icon: Icon(icon),
+                label: Text('Like'),
+              ),
+              SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {
+                  appState.getNext();
+                },
+                child: Text('Next'),
+              ),
+            ],
           ),
         ],
       ),
